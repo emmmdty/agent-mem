@@ -94,11 +94,17 @@ def load(model_path: str):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        torch_dtype=torch.float32,  # 编辑要算梯度，fp32 更稳
-        trust_remote_code=True,
-    ).cuda()
+
+    # transformers 5.x 把 torch_dtype 改名成 dtype，4.x 只认旧名。
+    # 两边都试一下——**这行代码本身就是「工具链不稳定」的一个标本**。
+    kwargs = {"trust_remote_code": True}
+    try:
+        model = AutoModelForCausalLM.from_pretrained(model_path, dtype=torch.float32, **kwargs)
+    except TypeError:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path, torch_dtype=torch.float32, **kwargs
+        )
+    model = model.cuda()
     model.eval()
     return model, tok
 

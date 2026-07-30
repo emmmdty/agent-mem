@@ -64,6 +64,37 @@ LESSON = Lesson(
                 "在它成熟之前，任何涉及个人信息的记忆都不该只放在权重里。"
             ),
         ),
+        Predict(
+            question=(
+                "在 RTX 4090 上真跑一次：把 Qwen2.5-0.5B 的「法国的首都」编辑成「里昂」，"
+                "10 步收敛、目标问题改对了。此时用**英文**问 "
+                "「The capital of France is」，输出会怎样？"
+            ),
+            options={
+                "A": "也变成 Lyon —— 知识是语言无关的",
+                "B": "变成一个中英混杂的奇怪答案",
+                "C": "一个字都没变，还是 Paris",
+            },
+            answer="C",
+            reveal=(
+                "**一个字都没变**：编辑前后都是「Paris. It was founded in」。\n"
+                "编辑发生在中文的表示上，英文路径完全没被触及。\n"
+                "整体 Generalization 只有 25%（4 个改写问法只有 1 个跟着改）。"
+            ),
+            trap=(
+                "同一次实验的 Specificity 是 50%，但**仔细看那两条「变了」的**："
+                "「德国的首都是」从「哪个城市？」变成了「柏林」——**它变得更对了**。\n"
+                "这不是知识被污染，是**回答格式发生了溢出**。\n"
+                "自动化指标只能测「输出是否改变」，分不清「被污染」和「被带偏」——"
+                "这正是文献里编辑成功率难以直接比较的原因之一。"
+            ),
+        ),
+        Run(
+            script="docs/chapter9/code/03_minimal_edit.py",
+            why="（需要 GPU）自己跑一次真实的权重编辑，一百行实现，不依赖 EasyEdit。",
+            look_for="三个维度的汇总——只报第一行的话，这会是一次「100% 成功」的编辑。",
+            minutes=5,
+        ),
         Recall(
             question="什么场景适合参数化记忆？",
             answer=(
@@ -95,13 +126,13 @@ LESSON = Lesson(
         Apply(
             level="🟡",
             task=(
-                "（需要 GPU）跑通 01_model_edit.py，记录三类问题的编辑前后对比，"
-                "**特别注意邻近问题有没有被污染**。"
+                "（需要 GPU）跑 03_minimal_edit.py，然后换一层（AGENT_MEM_EDIT_LAYER）"
+                "或换个模型重跑，看三个维度怎么变。"
             ),
-            starting_point="docs/chapter9/code/requirements.txt，建议单独建环境",
+            starting_point="docs/chapter9/code/requirements.txt，建议单独建环境；0.5B 约需 4GB 显存",
             success_looks_like=(
-                "目标问题改成功，而改写问题与邻近问题表现差异很大。"
-                "跑通或跑不通都欢迎提 Issue——本书作者没有验证过它"
+                "换层/换模型后三个维度明显不同——"
+                "**说明模型编辑对超参数相当敏感，而这些超参数没有普适取法**"
             ),
         ),
         Apply(

@@ -6,14 +6,22 @@
 #      python -m venv .venv-ch9 && source .venv-ch9/bin/activate
 #      pip install -r docs/chapter9/code/requirements.txt
 #
-# ⚠️ 本书作者未在 GPU 上验证过 01_model_edit.py 的输出。
-#    正文引用的所有数字均来自论文，不来自这个脚本。
+# 状态：
+#   03_minimal_edit.py  ✅ 已在单张 RTX 4090 上跑通（正文 9.6 节即为其实测数据）
+#   01_model_edit.py    ⚠️ EasyEdit/ROME 版，尚未跑通（需从源码装并配 hparams）
 #
 # ---- 02_why_editing_is_hard.py（概念演示） ----
 # 无依赖，纯标准库，任何环境都能跑：
 #   python docs/chapter9/code/02_why_editing_is_hard.py
 #
-# ---- 01_model_edit.py（需要 GPU） ----
+# ---- 03_minimal_edit.py（需要 GPU，推荐先跑这个） ----
+# 只需 torch + transformers + modelscope，显存 4GB（Qwen2.5-0.5B）
+# 实测可用 uv 装，不需要 sudo：
+#   uv venv --python 3.11 .venv-ch9
+#   uv pip install --python .venv-ch9/bin/python torch transformers accelerate modelscope
+#   CUDA_VISIBLE_DEVICES=0 .venv-ch9/bin/python docs/chapter9/code/03_minimal_edit.py
+#
+# ---- 01_model_edit.py（需要 GPU，EasyEdit 版） ----
 # 显存 ≥ 16GB（GPT-2 XL 约 12GB）
 torch>=2.0
 transformers>=4.40
