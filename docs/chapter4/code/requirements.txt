@@ -1,6 +1,6 @@
 # 第 4 章：图记忆
 #
-#   pip install -e ".[graph]"    # networkx
+#   pip install -e ".[graph]"    # networkx + scipy（pagerank 需要 scipy）
 #   pip install -e ".[vector]"   # 句向量（hybrid 模式需要）
 #   python -m minimem.utils.fetch_model
 #

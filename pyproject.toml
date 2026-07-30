@@ -42,7 +42,11 @@ stores = [
 # 第 4~5 章：图记忆与时间感知
 graph = [
     "networkx>=3.2",
-    "kuzu>=0.4",
+    # networkx 的 pagerank 走 scipy 稀疏矩阵实现，缺了它会在**调用时**
+    # 抛 ModuleNotFoundError，而不是在 import networkx 时。
+    # 这类「依赖的依赖」最容易漏——本地因为别的包顺带装上了 scipy 而一切正常，
+    # 只装 .[graph] 的读者却会撞墙。CI 就是这么把它抓出来的。
+    "scipy>=1.11",
 ]
 # 第 6~8 章：需要调用 LLM 的 agentic / 分层 / 技能记忆
 llm = [

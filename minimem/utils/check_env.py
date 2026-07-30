@@ -28,7 +28,8 @@ CHAPTER_DEPS: dict[str, tuple[str, list[tuple[str, str]]]] = {
         "graph",
         [
             ("networkx", "networkx"),
-            ("kuzu", "kuzu"),
+            # networkx.pagerank 走 scipy 的稀疏实现，缺了它会在调用时才报错
+            ("scipy", "scipy"),
         ],
     ),
     "第 6~8 章 LLM 驱动": (
