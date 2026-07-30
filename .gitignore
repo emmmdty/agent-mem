@@ -56,6 +56,10 @@ lancedb/
 eval_results/
 *.jsonl.gz
 
+# ---- 交互式课程的个人进度（属于你，不入库） ----
+.learn/
+agent-mem-cards.csv
+
 # ---- 模型权重 ----
 *.bin
 *.safetensors
