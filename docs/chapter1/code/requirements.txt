@@ -1,0 +1,10 @@
+# 第 1 章：无额外依赖
+#
+# 本章三个脚本只用到 minimem 的核心部分（标准库 + numpy），
+# 在仓库根目录执行 `pip install -e .` 即可运行。
+#
+#   python docs/chapter1/code/01_goldfish_agent.py   # 三种取用历史的方式
+#   python docs/chapter1/code/02_context_cost.py     # 全历史注入的成本账
+#   python docs/chapter1/code/03_buffer_walls.py     # BufferMemory 的三堵墙
+#
+# 三个脚本都无需 API Key、无需联网，合计约 5 秒跑完。
