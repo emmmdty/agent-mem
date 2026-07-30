@@ -45,7 +45,7 @@
 | [第 2 章](./docs/chapter2/) | 上下文与长上下文记忆 | `WindowMemory` | CPU / 单卡 | ✅ |
 | [第 3 章](./docs/chapter3/) | 检索增强记忆基础 | `VectorMemory` | CPU | ✅ |
 | [第 4 章](./docs/chapter4/) | 结构化与图记忆 | `GraphMemory` | CPU | ✅ |
-| [第 5 章](./docs/chapter5/) | 时间感知与知识演化 | `TemporalGraphMemory` | CPU | 🚧 |
+| [第 5 章](./docs/chapter5/) | 时间感知与知识演化 | `TemporalGraphMemory` | CPU | ✅ |
 | [第 6 章](./docs/chapter6/) | agentic memory 与自组织 | `AgenticMemory` | CPU + API | 🚧 |
 | [第 7 章](./docs/chapter7/) | OS 式分层记忆与调度 | `LayeredMemory` | CPU + API | 🚧 |
 | [第 8 章](./docs/chapter8/) | 经验与技能记忆 | `SkillMemory` | CPU + API | 🚧 |

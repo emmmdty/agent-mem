@@ -28,6 +28,7 @@ from minimem.base import (
 )
 from minimem.buffer import BufferMemory
 from minimem.graph import GraphMemory
+from minimem.temporal import TemporalGraphMemory
 from minimem.utils.metering import Meter, OpRecord, get_default_meter, reset_default_meter
 from minimem.vector import VectorMemory
 from minimem.window import WindowMemory
@@ -42,6 +43,7 @@ __all__ = [
     "CrossUserAccessError",
     "BufferMemory",
     "GraphMemory",
+    "TemporalGraphMemory",
     "VectorMemory",
     "WindowMemory",
     "Meter",

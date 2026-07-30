@@ -1,0 +1,11 @@
+# 第 5 章：时间感知
+#
+#   pip install -e ".[graph]"    # 继承第 4 章的图记忆
+#   pip install -e ".[vector]"   # 句向量（hybrid 模式）
+#
+#   python docs/chapter5/code/01_two_timelines.py   # 双时间轴与时点查询
+#   python docs/chapter5/code/02_provenance.py      # 来源追溯与级联删除
+#
+# 两个脚本各几秒，全部离线可跑。
+# 「今天」被固定为 MiniBench 的基准日 2026-07-30，保证结果可复现——
+# 时间相关的代码不注入时钟就没法测，这一点在正文和测试里都强调了。
