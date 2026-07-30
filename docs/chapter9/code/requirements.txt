@@ -1,0 +1,27 @@
+# 第 9 章：参数化记忆（模型编辑）
+#
+# ⚠️ 强烈建议为本章单独建一个环境。模型编辑工具链对 torch / transformers
+#    版本非常敏感，与本书其他章节容易冲突：
+#
+#      python -m venv .venv-ch9 && source .venv-ch9/bin/activate
+#      pip install -r docs/chapter9/code/requirements.txt
+#
+# ⚠️ 本书作者未在 GPU 上验证过 01_model_edit.py 的输出。
+#    正文引用的所有数字均来自论文，不来自这个脚本。
+#
+# ---- 02_why_editing_is_hard.py（概念演示） ----
+# 无依赖，纯标准库，任何环境都能跑：
+#   python docs/chapter9/code/02_why_editing_is_hard.py
+#
+# ---- 01_model_edit.py（需要 GPU） ----
+# 显存 ≥ 16GB（GPT-2 XL 约 12GB）
+torch>=2.0
+transformers>=4.40
+# EasyEdit 未发布到 PyPI，需从源码安装：
+#   git clone https://github.com/zjunlp/EasyEdit && pip install -e EasyEdit
+# 🕐 它的 API 在版本间变动较大——这本身就是这条技术路线不成熟的一个信号。
+
+# 模型下载走 ModelScope（国内 HuggingFace 不可达）：
+#   pip install modelscope
+#   python -m minimem.utils.fetch_model gpt2-xl
+modelscope>=1.9
