@@ -176,7 +176,7 @@ def _all(self, *, user_id: str) -> list[MemoryItem]: ...
 在 `tests/test_base.py` 的 `ALL_STORES` 里加一行，全部契约测试自动生效：
 
 ```python
-pytest.param(functools.partial(YourMemory, embedder=FakeEmbedder()), id="your"),
+(pytest.param(functools.partial(YourMemory, embedder=FakeEmbedder()), id="your"),)
 ```
 
 ### LLM 调用
@@ -186,8 +186,8 @@ pytest.param(functools.partial(YourMemory, embedder=FakeEmbedder()), id="your"),
 ```python
 from minimem.utils.llm import LLMClient, ScriptedLLM, get_llm
 
-result = llm.complete(prompt, op="extract")   # op 要有意义，报表按它分组
-data = result.json(default={})                # 解析失败返回 default，不抛异常
+result = llm.complete(prompt, op="extract")  # op 要有意义，报表按它分组
+data = result.json(default={})  # 解析失败返回 default，不抛异常
 ```
 
 **离线可跑是硬约束。** 需要 LLM 的实现必须接受注入的 `LLMClient`，并在章节脚本里用 `ScriptedLLM` 注册预设逻辑，保证 `# offline-ok` 成立。同时在正文里明确：**哪些结论换成真模型后会变**。
