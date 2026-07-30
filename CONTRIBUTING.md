@@ -24,6 +24,12 @@ pytest                  # 测试（不含 slow / needs_api / needs_gpu 标记）
 - 新增章节文件后，已同步更新 `docs/_sidebar.md`。
 - `docsify serve docs` 本地打开无渲染异常。
 
+## 写新章节？
+
+先读 **[CHAPTER_GUIDE.md](./CHAPTER_GUIDE.md)**——它有完整的章节模板、`MemoryStore` 契约、交互式课程的写法，以及并行协作时的文件所有权约定。已完成的第 1、2、3、10 章是参考实现。
+
+下面是所有贡献都适用的通用规范。
+
 ## 内容写作规范
 
 ### 1. 数字必须带来源标记
