@@ -1,0 +1,28 @@
+# lychee 死链检查配置
+# 本仓库外链多为 arXiv / GitHub / 厂商文档，部分站点对 CI 出口 IP 有速率限制或反爬，
+# 因此这里只把「确定失效」当问题，超时与 429 不算失败（由 workflow 的 fail: false 兜底）。
+
+max_concurrency = 8
+timeout = 20
+max_retries = 2
+retry_wait_time = 4
+
+# docsify 的相对锚点与站点内路径由本地文件检查覆盖，不做 HTTP 请求
+exclude_path = ["node_modules", ".git", ".venv"]
+
+exclude = [
+  # 本地预览地址
+  "^http://localhost",
+  "^http://127\\.0\\.0\\.1",
+  # 站点尚未部署时的自引用（首次发布前会 404）
+  "^https://emmmdty\\.github\\.io",
+  # 这些站点对无头请求返回 403，人工可访问
+  "^https://www\\.jstor\\.org",
+  "^https://dl\\.acm\\.org",
+  "^https://ieeexplore\\.ieee\\.org",
+  "^https://linkinghub\\.elsevier\\.com",
+  "^https://x\\.com",
+  "^https://twitter\\.com",
+]
+
+accept = ["200", "206", "301", "302", "403", "429"]

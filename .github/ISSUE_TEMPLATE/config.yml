@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 开发路线图
+    url: https://github.com/emmmdty/agent-mem/blob/main/ROADMAP.md
+    about: 想知道某一章什么时候写？先看路线图的阶段划分。
+  - name: 贡献指南
+    url: https://github.com/emmmdty/agent-mem/blob/main/CONTRIBUTING.md
+    about: 提 PR 前请先读写作规范与 Git 工作流约定。
+  - name: 讨论区
+    url: https://github.com/emmmdty/agent-mem/discussions
+    about: 开放性问题、选型讨论、学习心得请到 Discussions。

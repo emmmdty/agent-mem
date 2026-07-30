@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint & Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format 检查
+        run: ruff format --check .
+
+      - name: 运行测试（跳过慢速 / 需 API / 需 GPU 的用例）
+        run: pytest -m "not slow and not needs_api and not needs_gpu" --cov=minimem --cov-report=term-missing
+
+  chapter-scripts-smoke:
+    name: 章节脚本冒烟测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: 安装主线包
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: 语法检查全部章节脚本
+        run: python -m compileall -q docs
+
+      - name: 运行标记为「离线可跑」的章节脚本
+        # 约定：文件头第一行含 "# offline-ok" 的脚本必须能在无网络、无 API Key 的环境下跑完
+        run: |
+          set -e
+          found=0
+          while IFS= read -r f; do
+            if head -n 3 "$f" | grep -q "offline-ok"; then
+              echo "::group::运行 $f"
+              python "$f"
+              echo "::endgroup::"
+              found=$((found+1))
+            fi
+          done < <(find docs -name "*.py" | sort)
+          echo "共运行 $found 个离线脚本"

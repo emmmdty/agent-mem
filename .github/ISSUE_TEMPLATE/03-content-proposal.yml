@@ -1,0 +1,54 @@
+name: 新增内容建议
+description: 建议补充论文、框架、实验或整节内容
+title: "[建议] "
+labels: ["建议"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        本教程刻意保持克制：**不做框架名录，不排天梯榜**。
+        因此请重点说明——它引入了什么**既有方案没有的机制**？
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 建议类型
+      options:
+        - 补充论文
+        - 补充框架 / 工具
+        - 补充实验
+        - 补充整节 / 整章
+        - 其他
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: 建议放在哪一章
+      placeholder: "第 6 章"
+    validations:
+      required: true
+
+  - type: textarea
+    id: novelty
+    attributes:
+      label: 它引入了什么新机制
+      description: 相比教程已覆盖的方案，它在「表征 / 操作 / 载体」哪一维上有实质不同？
+    validations:
+      required: true
+
+  - type: textarea
+    id: cost
+    attributes:
+      label: 已知的代价
+      description: token / 延迟 / 成本 / 依赖复杂度，任意已知信息
+    validations:
+      required: false
+
+  - type: textarea
+    id: links
+    attributes:
+      label: 相关链接
+    validations:
+      required: true

@@ -1,0 +1,78 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# ---- 虚拟环境 ----
+.venv/
+venv/
+env/
+ENV/
+.conda/
+
+# ---- 测试与工具缓存 ----
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- 密钥与本地配置（务必不要提交） ----
+.env
+.env.*
+!.env.example
+*.key
+secrets.*
+
+# ---- 教程运行产物 ----
+# 各章实验生成的向量库 / 图库 / 缓存 / 评测结果
+data/
+!data/.gitkeep
+outputs/
+runs/
+cache/
+*.duckdb
+*.kuzu/
+*.sqlite
+*.sqlite3
+chroma_db/
+.chroma/
+lancedb/
+*.faiss
+*.index
+
+# 评测结果（可复现，不入库；如需归档请放 docs/chapter10/results/）
+eval_results/
+*.jsonl.gz
+
+# ---- 模型权重 ----
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.gguf
+models/
+
+# ---- 编辑器 / 操作系统 ----
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 站点构建（docsify 无需构建，仅忽略本地服务缓存） ----
+node_modules/
+.docsify_cache/

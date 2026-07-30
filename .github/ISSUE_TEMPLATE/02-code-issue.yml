@@ -1,0 +1,49 @@
+name: 代码 / 环境问题
+description: 章节示例跑不通、MiniMem 报错、依赖安装失败
+title: "[代码] "
+labels: ["代码"]
+body:
+  - type: input
+    id: script
+    attributes:
+      label: 出问题的脚本或模块
+      placeholder: "docs/chapter3/code/03_hybrid_search.py 或 minimem/vector.py"
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: 复现命令
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: 完整报错信息
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境信息
+      description: 请粘贴 `python -V`、`pip list | grep -E "minimem|numpy|sentence|chroma|networkx"` 的输出
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - WSL
+    validations:
+      required: true

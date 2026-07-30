@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minimem"
+version = "0.1.0"
+description = "MiniMem —— agent-mem 教程贯穿全书的最小可用 Agent 记忆系统"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "agent-mem contributors" }]
+keywords = ["llm", "agent", "memory", "rag", "tutorial"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# 核心依赖刻意保持极小：第 1~2 章只用标准库 + numpy 即可跑通。
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# 第 3 章：向量检索与混合检索
+vector = [
+    "sentence-transformers>=3.0",
+    "chromadb>=0.5",
+    "rank-bm25>=0.2.2",
+]
+# 第 4~5 章：图记忆与时间感知
+graph = [
+    "networkx>=3.2",
+    "kuzu>=0.4",
+]
+# 第 6~8 章：需要调用 LLM 的 agentic / 分层 / 技能记忆
+llm = [
+    "openai>=1.40",
+    "tiktoken>=0.7",
+]
+# 第 10 章：评测 harness
+eval = [
+    "datasets>=2.20",
+    "pandas>=2.0",
+    "matplotlib>=3.8",
+]
+# 开发与 CI
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+# 一次装齐（不含第 9 章的 GPU 相关依赖，见 docs/chapter9/code/requirements.txt）
+all = ["minimem[vector,graph,llm,eval,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/emmmdty/agent-mem"
+Documentation = "https://emmmdty.github.io/agent-mem/"
+Repository = "https://github.com/emmmdty/agent-mem"
+
+[tool.setuptools.packages.find]
+include = ["minimem*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",  # 教程代码中的说明性长注释不强制换行
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# 章节示例脚本以可读性优先，允许打印与顶层执行
+"docs/**/code/*.py" = ["T201", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "slow: 需要下载模型或调用外部 API 的测试（CI 默认跳过）",
+    "needs_api: 需要配置 LLM API Key 的测试",
+    "needs_gpu: 需要 GPU 的测试（第 9 章）",
+]

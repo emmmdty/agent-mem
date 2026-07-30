@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "agent-mem: 从零开始学 Agent 记忆"
+message: "如果这份教程对你的研究或工作有帮助，欢迎按以下方式引用。"
+type: software
+authors:
+  - name: "agent-mem contributors"
+repository-code: "https://github.com/emmmdty/agent-mem"
+url: "https://emmmdty.github.io/agent-mem/"
+abstract: >-
+  一本面向工程实现的中文 Agent 记忆教程。以「表征 × 操作 × 载体」为统一框架，
+  贯穿一个从零手写的记忆系统 MiniMem，覆盖长上下文、检索增强、图记忆、时间感知、
+  自组织记忆、分层调度、技能记忆、参数化记忆，以及评测、安全与工程落地。
+keywords:
+  - llm
+  - agent
+  - memory
+  - retrieval-augmented-generation
+  - tutorial
+license: CC-BY-NC-SA-4.0
+license-url: "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+version: 0.1.0
+date-released: "2026-07-30"
