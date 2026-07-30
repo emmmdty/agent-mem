@@ -21,8 +21,7 @@ CHAPTER_DEPS: dict[str, tuple[str, list[tuple[str, str]]]] = {
         "vector",
         [
             ("sentence_transformers", "sentence-transformers"),
-            ("chromadb", "chromadb"),
-            ("rank_bm25", "rank-bm25"),
+            ("modelscope", "modelscope"),
         ],
     ),
     "第 4~5 章 图记忆": (
@@ -144,20 +143,29 @@ def check_embedding() -> None:
         return
 
     print(f"      配置的模型：{configured}")
-    if not _has("sentence_transformers"):
-        print(f'{WARN}sentence-transformers 未安装：pip install -e ".[vector]"')
-        return
 
     from pathlib import Path
 
-    cache = Path(os.getenv("HF_HOME", Path.home() / ".cache" / "huggingface"))
-    hub = cache / "hub"
-    marker = configured.replace("/", "--")
-    if hub.exists() and any(marker in p.name for p in hub.iterdir()):
-        print(f"{OK} 模型已在本地缓存：{hub}")
+    from minimem.utils.embedding import LOCAL_MODEL_DIR, _find_local_snapshot
+
+    if Path(configured).is_dir():
+        print(f"{OK} 使用本地目录：{Path(configured).resolve()}")
+    elif (snapshot := _find_local_snapshot(configured)) is not None:
+        print(f"{OK} 已下载到本地：{snapshot}")
     else:
-        print(f"{WARN}模型尚未下载，首次使用会自动下载（约 400MB）")
-        print("      国内建议先设置：export HF_ENDPOINT=https://hf-mirror.com")
+        print(f"{WARN}模型尚未下载到 {LOCAL_MODEL_DIR.resolve()}")
+        print("      国内推荐从 ModelScope 下载：python -m minimem.utils.fetch_model")
+        print("      （HuggingFace 在国内多数网络下不可达，本书默认不走它）")
+
+    backends = []
+    if _has("sentence_transformers"):
+        backends.append("sentence-transformers")
+    if _has("fastembed"):
+        backends.append("fastembed")
+    if backends:
+        print(f"{OK} 可用推理后端：{', '.join(backends)}")
+    else:
+        print(f'{WARN}无可用推理后端：pip install -e ".[vector]"')
 
 
 def main() -> int:

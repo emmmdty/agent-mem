@@ -24,11 +24,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# 第 3 章：向量检索与混合检索
+# 第 3 章：向量检索与混合检索。
+# 模型从 ModelScope 下载（国内 HuggingFace 通常不可达），故 modelscope 是必装项。
 vector = [
     "sentence-transformers>=3.0",
+    "modelscope>=1.9",
+]
+# 轻量替代：onnxruntime 推理，不需要 torch（安装体积从约 2GB 降到约 100MB），
+# 但模型从 HuggingFace 拉取，国内多数网络下不通。海外网络可用。
+vector-onnx = [
+    "fastembed>=0.4",
+]
+# 可选：把 MiniMem 的内存索引换成真实向量库（第 3 章末尾的对照实验）
+stores = [
     "chromadb>=0.5",
-    "rank-bm25>=0.2.2",
 ]
 # 第 4~5 章：图记忆与时间感知
 graph = [

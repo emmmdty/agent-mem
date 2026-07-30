@@ -1,0 +1,19 @@
+# 第 3 章：向量检索与混合检索
+#
+# 在仓库根目录执行：
+#   pip install -e ".[vector]"          # sentence-transformers + modelscope
+#   python -m minimem.utils.fetch_model # 从 ModelScope 下载句向量模型（国内推荐）
+#
+# 海外网络可用时的轻量替代（不需要 torch，安装体积约 100MB）：
+#   pip install -e ".[vector-onnx]"
+#
+# 完全离线时：export AGENT_MEM_EMBED_MODEL=fake
+#   —— 流程能跑通，但检索效果不具参考价值（实验一会告诉你差多少）
+#
+# 本章脚本：
+#   python docs/chapter3/code/01_semantic_vs_literal.py   # 语义 vs 字面 vs 哈希对照
+#   python docs/chapter3/code/02_hybrid_search.py         # dense/BM25/hybrid + RRF
+#   python docs/chapter3/code/03_granularity.py           # 一条记忆该多大
+#   python docs/chapter3/code/04_scale_and_index.py       # 规模、延迟与 ANN 的分界
+#
+# 前三个脚本各几秒；第四个要建 5 万条记忆的索引，约一分钟。
