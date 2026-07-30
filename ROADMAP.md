@@ -60,15 +60,26 @@ P1 期间的两处计划外调整，记录在此：
   理由：它需要额外的 1.1GB 模型，而 MiniBench 规模下收益无法测出，
   违反「跑不动或测不出的示例不该留在教程里」这条质量红线。
 
-### P2 —— 上下文与结构化（tag: `v0.3.0`）
+### P2 —— 上下文与结构化（tag: `v0.3.0`）✅
 
-| 章节 | 主线产出 |
-| :--- | :--- |
-| 第 2 章 长上下文 | `minimem/window.py`（滑窗 + attention sink 保留策略） |
-| 第 4 章 图记忆 | `minimem/graph.py`（实体图 + Personalized PageRank 检索） |
-| 第 5 章 时间感知 | `minimem/temporal.py`（bi-temporal 事实表 + 失效 + 时点查询） |
+| 章节 | 主线产出 | 状态 |
+| :--- | :--- | :--- |
+| 第 2 章 长上下文 | `minimem/window.py`（滑窗 + sink / pinned 三种淘汰策略） | ✅ |
+| 第 4 章 图记忆 | `minimem/graph.py`（实体图 + Personalized PageRank） | ✅ |
+| 第 5 章 时间感知 | `minimem/temporal.py`（bi-temporal + 失效 + 时点查询 + provenance） | ✅ |
 
-**DoD**：第 4、5 章的实现能接入 P1 的 harness 并产出可比对的成本表；第 5 章能正确回答「三个月前他在哪家公司」这类时点问题。
+**DoD**：三章实现均已接入 harness 并纳入契约测试；第 5 章能正确回答「三个月前他在哪家公司」，
+并能给出「当前无有效值」这个反直觉但正确的答案。✅
+
+P2 期间的计划外收获，记录在此：
+
+- **交互式学习层**（`minimem/learn/`）。用户提出后新增，吸收了 learn-claude-code 与
+  shareAI-lab/learn-claude-code 的形式：预测题、检查点、三级挑战、间隔复习。
+  正文同步加了 🤔 / ✅ / 🔧 / 🧠 标记，只读 markdown 也能得到完整体验。
+- **第 3 章的 RRF 陷阱在第 4 章的 PPR 通道复现了一次**。同一个坑、同一种修法，
+  但门槛值差两个数量级。这条经验已写进两章正文。
+- **第 5 章的召回率相对第 4 章零提升**。如实报告，并把它作为
+  「检索指标测不到端到端效果」最干净的例证。
 
 ### P3 —— agentic 与系统式（tag: `v0.4.0`）
 

@@ -17,6 +17,7 @@ from minimem import (
     MemoryNotFoundError,
 )
 from minimem.graph import GraphMemory
+from minimem.temporal import TemporalGraphMemory
 from minimem.utils.embedding import FakeEmbedder
 from minimem.utils.metering import Meter
 from minimem.vector import VectorMemory
@@ -32,6 +33,7 @@ ALL_STORES = [
     pytest.param(
         functools.partial(GraphMemory, embedder=FakeEmbedder(), mode="hybrid"), id="graph"
     ),
+    pytest.param(functools.partial(TemporalGraphMemory, embedder=FakeEmbedder()), id="temporal"),
 ]
 
 
