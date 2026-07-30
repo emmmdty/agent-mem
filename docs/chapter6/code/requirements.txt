@@ -1,0 +1,15 @@
+# 第 6 章：agentic memory 与自组织
+#
+#   pip install -e ".[vector]"
+#   python -m minimem.utils.fetch_model
+#
+#   python docs/chapter6/code/01_extract_update.py     # ADD/UPDATE/NOOP 决策
+#   python docs/chapter6/code/02_cost_and_failure.py   # 账单与失败模式
+#
+# 两个脚本各几秒，全部离线：LLM 用 ScriptedLLM 模拟。
+# **模拟的是流程与用量，不是判断力**——决策质量与失败模式换真模型会变，
+# 但成本结构（每条 1~2 次调用）不变。
+#
+# 想用真模型跑：pip install -e ".[llm]"，配好 .env，
+# 把脚本里的 make_llm(meter) 换成 get_llm(meter=meter)。
+# 注意：30 条记忆约 60 次调用，跑之前先看一眼你的配额。

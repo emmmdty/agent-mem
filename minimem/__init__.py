@@ -19,6 +19,7 @@
 尚未实现的模块导入时会给出明确提示，而不是 ImportError 的堆栈。
 """
 
+from minimem.agentic import AgenticMemory
 from minimem.base import (
     CrossUserAccessError,
     MemoryItem,
@@ -43,6 +44,7 @@ __all__ = [
     "MemoryNotFoundError",
     "CrossUserAccessError",
     "BufferMemory",
+    "AgenticMemory",
     "GraphMemory",
     "TemporalGraphMemory",
     "SkillMemory",
