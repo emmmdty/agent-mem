@@ -1,0 +1,14 @@
+# 第 10 章：评测、安全与工程落地
+#
+# 本章两个脚本无额外依赖，用 minimem 核心 + 第 3 章的向量能力即可：
+#   pip install -e ".[vector]"
+#   python -m minimem.utils.fetch_model
+#
+#   python docs/chapter10/code/01_harness.py            # 效果与代价的七列表
+#   python docs/chapter10/code/02_memory_poisoning.py   # 记忆投毒与分层防御
+#
+# 两个脚本各几秒。未安装向量模型时会降级为 FakeEmbedder 并提示，
+# 流程仍能跑通，但向量方案的结果不具参考价值。
+#
+# 可选：如果要跑真实 LLM 的端到端评测（本书未提供现成脚本，见 10.6 节说明），
+# 需要 pip install -e ".[llm]" 并配置 .env 里的 API Key。

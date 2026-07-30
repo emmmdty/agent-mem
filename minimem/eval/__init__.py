@@ -5,6 +5,7 @@
 - ``harness``：第 10 章的评测执行器（把检索指标与 Meter 的成本数据合并）
 """
 
+from minimem.eval.attack import PoisonAttack, PoisonResult, WriteFilter, measure_poisoning
 from minimem.eval.dataset import (
     CAPABILITIES,
     MINI_MEMORIES,
@@ -14,6 +15,7 @@ from minimem.eval.dataset import (
     as_memory_items,
     load_mini_bench,
 )
+from minimem.eval.harness import EvalHarness, EvalResult
 from minimem.eval.metrics import aggregate, hit_rate, mrr, precision_at_k, recall_at_k
 
 __all__ = [
@@ -29,4 +31,10 @@ __all__ = [
     "precision_at_k",
     "mrr",
     "aggregate",
+    "EvalHarness",
+    "EvalResult",
+    "PoisonAttack",
+    "PoisonResult",
+    "measure_poisoning",
+    "WriteFilter",
 ]
