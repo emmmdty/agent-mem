@@ -19,6 +19,7 @@ from minimem import (
 from minimem.utils.embedding import FakeEmbedder
 from minimem.utils.metering import Meter
 from minimem.vector import VectorMemory
+from minimem.window import WindowMemory
 
 # 随着章节推进，这个列表会变长。每加一个实现，上面全部契约测试自动生效——
 # 这是「八种实现可横向比较」这个承诺的最低成本保障。
@@ -26,6 +27,7 @@ from minimem.vector import VectorMemory
 ALL_STORES = [
     pytest.param(BufferMemory, id="buffer"),
     pytest.param(functools.partial(VectorMemory, embedder=FakeEmbedder()), id="vector"),
+    pytest.param(functools.partial(WindowMemory, budget_tokens=100_000), id="window"),
 ]
 
 

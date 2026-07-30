@@ -1,0 +1,7 @@
+# 第 2 章：无额外依赖
+#
+# 两个脚本只用 minimem 核心（标准库 + numpy），无需 API Key、无需联网：
+#   python docs/chapter2/code/01_what_gets_dropped.py   # 三种淘汰策略丢掉了什么
+#   python docs/chapter2/code/02_compression.py         # 压缩的收益与失真
+#
+# 各约 1 秒。
