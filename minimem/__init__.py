@@ -27,6 +27,7 @@ from minimem.base import (
     SearchResult,
 )
 from minimem.buffer import BufferMemory
+from minimem.graph import GraphMemory
 from minimem.utils.metering import Meter, OpRecord, get_default_meter, reset_default_meter
 from minimem.vector import VectorMemory
 from minimem.window import WindowMemory
@@ -40,6 +41,7 @@ __all__ = [
     "MemoryNotFoundError",
     "CrossUserAccessError",
     "BufferMemory",
+    "GraphMemory",
     "VectorMemory",
     "WindowMemory",
     "Meter",

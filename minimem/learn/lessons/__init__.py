@@ -7,7 +7,7 @@ markdown 负责完整论述，课程负责「先猜、动手、自测、复述�
 
 from __future__ import annotations
 
-from minimem.learn.lessons import ch01, ch02, ch03, ch10
+from minimem.learn.lessons import ch01, ch02, ch03, ch04, ch10
 from minimem.learn.models import Card, Lesson
 
 __all__ = ["LESSONS", "ALL_CARDS", "get_lesson"]
@@ -16,6 +16,7 @@ LESSONS: list[Lesson] = [
     ch01.LESSON,
     ch02.LESSON,
     ch03.LESSON,
+    ch04.LESSON,
     ch10.LESSON,
 ]
 

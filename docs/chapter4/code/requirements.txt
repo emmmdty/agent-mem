@@ -1,0 +1,13 @@
+# 第 4 章：图记忆
+#
+#   pip install -e ".[graph]"    # networkx
+#   pip install -e ".[vector]"   # 句向量（hybrid 模式需要）
+#   python -m minimem.utils.fetch_model
+#
+#   python docs/chapter4/code/01_multihop.py            # 多跳查询：向量 vs 图
+#   python docs/chapter4/code/02_ppr_and_the_trap.py    # PPR 传播与融合陷阱
+#   python docs/chapter4/code/03_extraction_cost.py     # 建图的三块成本
+#
+# 三个脚本各几秒，全部离线可跑。
+# 未安装句向量模型时会降级为 FakeEmbedder，纯 ppr 模式的结论仍然成立，
+# 但 hybrid 模式的数字不具参考价值。
