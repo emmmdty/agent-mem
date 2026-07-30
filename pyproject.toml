@@ -79,6 +79,13 @@ ignore = [
 # 章节示例脚本以可读性优先，允许打印与顶层执行
 "docs/**/code/*.py" = ["T201", "E402"]
 
+[tool.pyright]
+# 让编辑器/类型检查器认得仓库根目录建的 .venv
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "basic"
+reportMissingImports = "warning"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
