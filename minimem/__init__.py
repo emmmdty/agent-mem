@@ -28,6 +28,7 @@ from minimem.base import (
 )
 from minimem.buffer import BufferMemory
 from minimem.graph import GraphMemory
+from minimem.skill import SkillMemory
 from minimem.temporal import TemporalGraphMemory
 from minimem.utils.metering import Meter, OpRecord, get_default_meter, reset_default_meter
 from minimem.vector import VectorMemory
@@ -44,6 +45,7 @@ __all__ = [
     "BufferMemory",
     "GraphMemory",
     "TemporalGraphMemory",
+    "SkillMemory",
     "VectorMemory",
     "WindowMemory",
     "Meter",
