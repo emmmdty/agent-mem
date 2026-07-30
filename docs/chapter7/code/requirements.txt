@@ -1,0 +1,11 @@
+# 第 7 章：分层记忆与调度
+#
+#   pip install -e ".[vector]"
+#   python -m minimem.utils.fetch_model
+#
+#   python docs/chapter7/code/01_paging.py         # 热度换页：谁被换出去
+#   python docs/chapter7/code/02_summary_decay.py  # 摘要退化曲线
+#
+# 两个脚本各几秒，全部离线。
+# 第二个脚本连句向量都不需要——它是纯文本处理，
+# 兑现的是第 2 章末尾那道 🔴 挑战。
