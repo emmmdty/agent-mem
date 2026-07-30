@@ -40,17 +40,25 @@
 
 **DoD**：`git clone` 后 `pip install -e ".[dev]"` 与 `pytest` 均能通过；`docsify serve docs` 能打开站点且侧边栏完整。
 
-### P1 —— 主线打通（tag: `v0.2.0`）
+### P1 —— 主线打通（tag: `v0.2.0`）✅
 
 先写第 1、3、10 章。理由：这三章合起来构成一个**闭环最小系统**——有记忆抽象、有能用的检索实现、有能测出好坏与代价的 harness。后续每章都能立刻被 harness 检验，而不是写完十章才发现无法比较。
 
-| 章节 | 主线产出 |
-| :--- | :--- |
-| 第 1 章 导论 | `minimem/base.py`（`MemoryStore` 抽象）、`minimem/buffer.py` |
-| 第 3 章 检索增强记忆 | `minimem/vector.py`（chunk + embed + hybrid + rerank） |
-| 第 10 章 评测与安全 | `minimem/eval/`（数据集适配、成本-延迟-token 记录器、投毒回归） |
+| 章节 | 主线产出 | 状态 |
+| :--- | :--- | :--- |
+| 第 1 章 导论 | `minimem/base.py`（`MemoryStore` 抽象）、`minimem/buffer.py` | ✅ |
+| 第 3 章 检索增强记忆 | `minimem/vector.py`（dense + BM25 + RRF 融合） | ✅ |
+| 第 10 章 评测与安全 | `minimem/eval/`（MiniBench、harness、投毒回归） | ✅ |
 
-**DoD**：能用一条命令在同一份小规模数据上，对 `BufferMemory` 与 `VectorMemory` 跑出一张包含「准确率 / 平均延迟 / 每次调用 token / 估算成本」的对比表。
+**DoD**：`python docs/chapter10/code/01_harness.py` 在同一份数据上对四种实现产出「召回 / 准确 / MRR / 可答 / ctx token / 延迟 / p95 / 写入 / 成本」九列对比表。✅
+
+P1 期间的两处计划外调整，记录在此：
+
+- **模型下载源改为 ModelScope**。原计划走 HuggingFace，实测国内不可达；
+  新增 `python -m minimem.utils.fetch_model`，并提供 git lfs 备选路径。
+- **重排（rerank）从第 3 章主线移出**，降级为「机制与代价」一节。
+  理由：它需要额外的 1.1GB 模型，而 MiniBench 规模下收益无法测出，
+  违反「跑不动或测不出的示例不该留在教程里」这条质量红线。
 
 ### P2 —— 上下文与结构化（tag: `v0.3.0`）
 

@@ -39,19 +39,22 @@
 
 ## 全书目录
 
-| 章节 | 主题 | 主线新增模块 | 算力要求 |
-| :--- | :--- | :--- | :--- |
-| [第 1 章](./docs/chapter1/) | 导论：为什么 Agent 需要记忆 | `MemoryStore` 接口 / `BufferMemory` | CPU |
-| [第 2 章](./docs/chapter2/) | 上下文与长上下文记忆 | `WindowMemory` | CPU / 单卡 |
-| [第 3 章](./docs/chapter3/) | 检索增强记忆基础 | `VectorMemory` | CPU |
-| [第 4 章](./docs/chapter4/) | 结构化与图记忆 | `GraphMemory` | CPU |
-| [第 5 章](./docs/chapter5/) | 时间感知与知识演化 | `TemporalGraphMemory` | CPU |
-| [第 6 章](./docs/chapter6/) | agentic memory 与自组织 | `AgenticMemory` | CPU + API |
-| [第 7 章](./docs/chapter7/) | OS 式分层记忆与调度 | `LayeredMemory` | CPU + API |
-| [第 8 章](./docs/chapter8/) | 经验与技能记忆 | `SkillMemory` | CPU + API |
-| [第 9 章](./docs/chapter9/) | 参数化记忆与持续学习 | （对照实验，不入主线） | **需 GPU** |
-| [第 10 章](./docs/chapter10/) | 评测、安全与工程落地 | `EvalHarness` | CPU + API |
-| [附录](./docs/附录/) | 数据集清单 / 选型对比 / 参考文献 / 术语表 | — | — |
+| 章节 | 主题 | 主线新增模块 | 算力要求 | 状态 |
+| :--- | :--- | :--- | :--- | :--- |
+| [第 1 章](./docs/chapter1/) | 导论：为什么 Agent 需要记忆 | `MemoryStore` 接口 / `BufferMemory` | CPU | ✅ |
+| [第 2 章](./docs/chapter2/) | 上下文与长上下文记忆 | `WindowMemory` | CPU / 单卡 | 🚧 |
+| [第 3 章](./docs/chapter3/) | 检索增强记忆基础 | `VectorMemory` | CPU | ✅ |
+| [第 4 章](./docs/chapter4/) | 结构化与图记忆 | `GraphMemory` | CPU | 🚧 |
+| [第 5 章](./docs/chapter5/) | 时间感知与知识演化 | `TemporalGraphMemory` | CPU | 🚧 |
+| [第 6 章](./docs/chapter6/) | agentic memory 与自组织 | `AgenticMemory` | CPU + API | 🚧 |
+| [第 7 章](./docs/chapter7/) | OS 式分层记忆与调度 | `LayeredMemory` | CPU + API | 🚧 |
+| [第 8 章](./docs/chapter8/) | 经验与技能记忆 | `SkillMemory` | CPU + API | 🚧 |
+| [第 9 章](./docs/chapter9/) | 参数化记忆与持续学习 | （对照实验，不入主线） | **需 GPU** | 🚧 |
+| [第 10 章](./docs/chapter10/) | 评测、安全与工程落地 | `EvalHarness` | CPU + API | ✅ |
+| [附录](./docs/附录/) | 数据集清单 / 选型对比 / 参考文献 / 术语表 | — | — | 🚧 |
+
+> 写作顺序不是 1→10，而是先打通 **1 / 3 / 10** 这条闭环主线（有抽象、有实现、有评测），
+> 让后续每一章都能立刻被同一个 harness 检验。详见 [ROADMAP](./ROADMAP.md)。
 
 > 算力硬约束：除第 9 章的模型编辑实验外，**所有实验都能在纯 CPU + 一个 LLM API Key 的条件下跑通**；标注「单卡」的实验在 24GB 显存内可完成。
 
