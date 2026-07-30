@@ -28,9 +28,13 @@ jobs:
           cache: pip
 
       - name: 安装依赖
+        # 加 graph extras（networkx）：第 4、5 章的实现需要它，
+        # 不装的话那两章的测试会被静默跳过，等于没测。
+        # 刻意不装 vector extras——它会拉进 PyTorch，而测试全部用 FakeEmbedder，
+        # 验证的是检索管线的行为而不是嵌入模型的质量。
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[graph,dev]"
 
       - name: Ruff lint
         run: ruff check .
@@ -55,7 +59,7 @@ jobs:
       - name: 安装主线包
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[graph,dev]"
 
       - name: 语法检查全部章节脚本
         run: python -m compileall -q docs
