@@ -285,6 +285,21 @@
 
     .mermaid .edgeLabel rect { fill: var(--am-bg) !important; }
 
+    /* ============ 数据图表的白天/夜间双份 ============ */
+    /* tools/make_figures.py 每张图出 -light / -dark 两份 SVG。
+       单份图无论怎么配色，总有一套主题下对比度不够。 */
+    .markdown-section img.fig-light,
+    .markdown-section img.fig-dark {
+      display: block;
+      margin: 1.2em auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .markdown-section img.fig-dark { display: none; }
+    :root[data-theme="dark"] .markdown-section img.fig-light { display: none; }
+    :root[data-theme="dark"] .markdown-section img.fig-dark { display: block; }
+
     .mermaid-error {
       color: #c0392b;
       background: var(--am-bg-soft);
