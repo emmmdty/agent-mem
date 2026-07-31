@@ -28,12 +28,16 @@
 
 本章是第四种：**分层**。
 
-```
-    core      常驻上下文，有硬性 token 上限，每次都注入
-      ↑↓  换页
-    recall    近期可检索，不常驻
-      ↑↓  归档 / 回捞
-    archival  冷存，需要显式捞取，且可能只保留摘要
+```mermaid
+flowchart TB
+    core["core<br/>常驻上下文 · 有硬性 token 上限 · 每次都注入"]
+    recall["recall<br/>近期可检索 · 不常驻"]
+    archival["archival<br/>冷存 · 需显式捞取 · 可能只保留摘要"]
+
+    core -- "换页（预算超限）" --> recall
+    recall -- "提升 promote" --> core
+    recall -- "归档" --> archival
+    archival -- "回捞 include_archival=True" --> recall
 ```
 
 **它与第 2 章的根本区别是：窗口是丢弃，分层是降级。** 被换出 core 的记忆去了 recall，仍然可以被检索到。
