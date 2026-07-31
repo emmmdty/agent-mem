@@ -7,45 +7,454 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="面向工程实现的中文 Agent 记忆（Agent Memory）开源教程：表征 × 操作 × 载体，贯穿手写记忆系统 MiniMem。">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <meta name="theme-color" content="#3f7ef0">
+  <!-- 内联 SVG favicon：省掉一个文件，也省掉浏览器那条 favicon.ico 404 -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4.13.1/lib/themes/vue.css">
+  <!-- KaTeX 的 CSS 与 JS 必须同版本，否则字体度量对不上 -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <script>
+    // 必须在首屏绘制前定色，否则夜间模式会闪一下白底。
+    (function () {
+      try {
+        var saved = localStorage.getItem('agent-mem:theme');
+        var dark = saved ? saved === 'dark'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        var fs = parseInt(localStorage.getItem('agent-mem:fontsize'), 10);
+        if (fs >= 14 && fs <= 24) {
+          document.documentElement.style.setProperty('--am-font-size', fs + 'px');
+        }
+      } catch (e) { /* 隐私模式下 localStorage 会抛异常，忽略即可 */ }
+    })();
+  </script>
+
   <style>
+    /* ============ 主题变量 ============ */
     :root {
       --theme-color: #3f7ef0;
       --sidebar-width: 300px;
+
+      --am-font-size: 16px;
+      --am-line-height: 1.8;
+
+      --am-bg: #ffffff;
+      --am-bg-soft: #f8fafd;
+      --am-bg-code: #f6f8fa;
+      --am-fg: #34495e;
+      --am-fg-strong: #2c3e50;
+      --am-fg-muted: #7f8c9a;
+      --am-border: #e4e8ee;
+      --am-link: #3f7ef0;
+      --am-sidebar-bg: #fafbfc;
+      --am-shadow: 0 2px 12px rgba(0, 0, 0, .08);
     }
 
+    :root[data-theme="dark"] {
+      --theme-color: #6ea8ff;
+
+      --am-bg: #14181f;
+      --am-bg-soft: #1a1f28;
+      --am-bg-code: #1c222c;
+      --am-fg: #c3ccd8;
+      --am-fg-strong: #e8eef6;
+      --am-fg-muted: #8794a5;
+      --am-border: #2b3340;
+      --am-link: #6ea8ff;
+      --am-sidebar-bg: #10141a;
+      --am-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+    }
+
+    html, body {
+      background: var(--am-bg);
+    }
+
+    body {
+      color: var(--am-fg);
+      /* 中文优先的字体栈：先系统无衬线中文，再回退到通用 */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
+        "Noto Sans CJK SC", Roboto, Helvetica, sans-serif;
+      transition: background-color .2s ease, color .2s ease;
+    }
+
+    /* ============ 正文排版（字号可调） ============ */
     .markdown-section {
       max-width: 900px;
+      font-size: var(--am-font-size);
+      line-height: var(--am-line-height);
+      color: var(--am-fg);
     }
+
+    /* 标题一律用 em，才能跟着 --am-font-size 一起缩放 */
+    .markdown-section h1 { font-size: 2em; color: var(--am-fg-strong); }
+    .markdown-section h2 { font-size: 1.6em; color: var(--am-fg-strong); }
+    .markdown-section h3 { font-size: 1.3em; color: var(--am-fg-strong); }
+    .markdown-section h4 { font-size: 1.15em; color: var(--am-fg-strong); }
+    .markdown-section h5,
+    .markdown-section h6 { font-size: 1em; color: var(--am-fg-strong); }
+
+    .markdown-section p,
+    .markdown-section li,
+    .markdown-section td,
+    .markdown-section th {
+      font-size: inherit;
+      line-height: var(--am-line-height);
+    }
+
+    .markdown-section a { color: var(--am-link); }
+    .markdown-section strong { color: var(--am-fg-strong); }
+    .markdown-section hr { border-bottom: 1px solid var(--am-border); }
 
     .markdown-section table {
       display: table;
       width: 100%;
       overflow-x: auto;
+      border-color: var(--am-border);
     }
+
+    .markdown-section table td,
+    .markdown-section table th {
+      border-color: var(--am-border);
+    }
+
+    .markdown-section tr { border-top-color: var(--am-border); }
+    .markdown-section tr:nth-child(2n) { background-color: var(--am-bg-soft); }
 
     .markdown-section blockquote {
       border-left: 4px solid var(--theme-color);
-      background-color: #f8fafd;
+      background-color: var(--am-bg-soft);
+      color: var(--am-fg);
     }
 
+    .markdown-section blockquote p { color: inherit; }
+
+    /* 全书大量使用 details/summary（检查点、复习卡片），必须单独配色 */
+    .markdown-section details {
+      background: var(--am-bg-soft);
+      border: 1px solid var(--am-border);
+      border-radius: 6px;
+      padding: .4em .9em;
+      margin: 1em 0;
+    }
+
+    .markdown-section details summary {
+      cursor: pointer;
+      color: var(--am-fg-strong);
+      font-weight: 600;
+      padding: .3em 0;
+    }
+
+    /* ============ 代码 ============ */
     .markdown-section code {
-      font-size: 0.9em;
+      font-size: .9em;
+      background-color: var(--am-bg-code);
+      color: var(--am-fg-strong);
+    }
+
+    .markdown-section pre {
+      background-color: var(--am-bg-code);
+    }
+
+    .markdown-section pre > code {
+      background: transparent;
+      color: var(--am-fg);
+      font-size: .88em;
+      line-height: 1.6;
+    }
+
+    /* Prism 在夜间模式下的 token 配色 */
+    :root[data-theme="dark"] .token.comment,
+    :root[data-theme="dark"] .token.prolog,
+    :root[data-theme="dark"] .token.doctype,
+    :root[data-theme="dark"] .token.cdata { color: #6b7a8d; }
+
+    :root[data-theme="dark"] .token.punctuation { color: #a9b4c2; }
+
+    :root[data-theme="dark"] .token.property,
+    :root[data-theme="dark"] .token.tag,
+    :root[data-theme="dark"] .token.boolean,
+    :root[data-theme="dark"] .token.number,
+    :root[data-theme="dark"] .token.constant,
+    :root[data-theme="dark"] .token.symbol { color: #f08d7c; }
+
+    :root[data-theme="dark"] .token.selector,
+    :root[data-theme="dark"] .token.attr-name,
+    :root[data-theme="dark"] .token.string,
+    :root[data-theme="dark"] .token.char,
+    :root[data-theme="dark"] .token.builtin { color: #9ed17b; }
+
+    :root[data-theme="dark"] .token.operator,
+    :root[data-theme="dark"] .token.entity,
+    :root[data-theme="dark"] .token.url,
+    :root[data-theme="dark"] .token.variable { color: #7fd6c4; }
+
+    :root[data-theme="dark"] .token.atrule,
+    :root[data-theme="dark"] .token.attr-value,
+    :root[data-theme="dark"] .token.keyword { color: #8ab4f8; }
+
+    :root[data-theme="dark"] .token.function,
+    :root[data-theme="dark"] .token.class-name { color: #e6c07b; }
+
+    /* ============ 侧边栏 ============ */
+    .sidebar {
+      background: var(--am-sidebar-bg);
+      border-right: 1px solid var(--am-border);
     }
 
     .sidebar ul li a {
       font-size: 15px;
+      color: var(--am-fg);
     }
 
-    .cover-main .anchor span {
-      color: #34495e;
+    .sidebar ul li a:hover { color: var(--theme-color); }
+    .sidebar ul li.active > a { color: var(--theme-color); font-weight: 600; }
+    .sidebar ul li strong { color: var(--am-fg-muted); }
+    .app-name-link { color: var(--am-fg-strong) !important; }
+    .sidebar-toggle { background-color: transparent; }
+    .sidebar-toggle-button:hover { opacity: .7; }
+    .sidebar-toggle span { background-color: var(--theme-color); }
+
+    /* ============ 搜索插件 ============ */
+    .search input {
+      background: var(--am-bg-code);
+      color: var(--am-fg);
+      border: 1px solid var(--am-border);
+      border-radius: 4px;
+    }
+
+    .search .results-panel { color: var(--am-fg); }
+    .search h2, .search p { color: var(--am-fg); }
+    .search .matching-post { border-bottom: 1px solid var(--am-border); }
+    .search .matching-post em { color: var(--theme-color); font-style: normal; }
+    .search { border-bottom: 1px solid var(--am-border); }
+
+    /* ============ 分页插件 ============ */
+    .docsify-pagination-container {
+      border-top: 1px solid var(--am-border);
+      color: var(--am-fg-muted);
+    }
+
+    .pagination-item-title { color: var(--am-fg) !important; }
+    .pagination-item-label { color: var(--am-fg-muted) !important; }
+
+    /* ============ 复制代码按钮 ============ */
+    .docsify-copy-code-button {
+      background: var(--am-border) !important;
+      color: var(--am-fg-strong) !important;
+    }
+
+    /* ============ 封面页 ============ */
+    section.cover { background: var(--am-bg) !important; }
+    section.cover .cover-main { color: var(--am-fg); }
+    .cover-main .anchor span { color: var(--am-fg-strong); }
+    section.cover blockquote p { color: var(--am-fg-muted); }
+    section.cover .cover-main > p:last-child a { border-color: var(--theme-color); }
+
+    /* ============ 公式 ============ */
+    .katex { font-size: 1.05em; }
+
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: .5em 0;
+    }
+
+    /* KaTeX 默认继承颜色，夜间模式下自动跟随正文色，无需额外覆盖 */
+
+    /* ============ Mermaid 图 ============ */
+    .mermaid {
+      text-align: center;
+      margin: 1.5em 0;
+      overflow-x: auto;
+      background: transparent;
+    }
+
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* mermaid 会给连线标签铺一层不透明底色，夜间模式下是块突兀的浅灰。
+       统一改成跟随页面背景。 */
+    .mermaid .edgeLabel,
+    .mermaid .edgeLabel p,
+    .mermaid .edgeLabel foreignObject > div {
+      background-color: var(--am-bg) !important;
+      color: var(--am-fg) !important;
+    }
+
+    .mermaid .edgeLabel rect { fill: var(--am-bg) !important; }
+
+    .mermaid-error {
+      color: #c0392b;
+      background: var(--am-bg-soft);
+      border-left: 4px solid #c0392b;
+      padding: .8em 1em;
+      font-size: .9em;
+      white-space: pre-wrap;
+    }
+
+    /* ============ 右下角阅读设置面板 ============ */
+    /* 放右下角是因为 docsify 的 repo 角标固定在右上角，会打架 */
+    .am-tools {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 5px 7px;
+      background: var(--am-bg-soft);
+      border: 1px solid var(--am-border);
+      border-radius: 999px;
+      box-shadow: var(--am-shadow);
+      user-select: none;
+    }
+
+    .am-tools button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--am-fg);
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      padding: 6px 8px;
+      border-radius: 999px;
+      font-family: inherit;
+      transition: background-color .15s ease, color .15s ease;
+    }
+
+    .am-tools button:hover:not(:disabled) {
+      background: var(--am-border);
+      color: var(--theme-color);
+    }
+
+    .am-tools button:disabled { opacity: .35; cursor: not-allowed; }
+
+    .am-tools button:focus-visible {
+      outline: 2px solid var(--theme-color);
+      outline-offset: 1px;
+    }
+
+    .am-tools .am-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--am-border);
+      margin: 0 3px;
+    }
+
+    .am-tools .am-fontsize {
+      font-size: 12px;
+      color: var(--am-fg-muted);
+      min-width: 26px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media print {
+      .am-tools { display: none; }
+    }
+
+    @media screen and (max-width: 768px) {
+      .am-tools { right: 12px; bottom: 12px; }
     }
   </style>
 </head>
 
 <body>
   <div id="app">正在加载 agent-mem…</div>
+
+  <div class="am-tools" role="group" aria-label="阅读设置">
+    <button id="am-theme" type="button" aria-label="切换白天/夜间模式" title="白天/夜间（快捷键 T）">🌙</button>
+    <span class="am-divider" aria-hidden="true"></span>
+    <button id="am-font-dec" type="button" aria-label="缩小字号" title="缩小字号（快捷键 −）">A−</button>
+    <span class="am-fontsize" id="am-font-val" aria-live="polite">16</span>
+    <button id="am-font-inc" type="button" aria-label="放大字号" title="放大字号（快捷键 +）">A+</button>
+  </div>
+
+  <script>
+    // ==========================================================
+    // 阅读设置：主题 + 字号
+    // ==========================================================
+    (function () {
+      var FONT_MIN = 14, FONT_MAX = 24, FONT_STEP = 1, FONT_DEFAULT = 16;
+      var root = document.documentElement;
+
+      function store(k, v) {
+        try { localStorage.setItem('agent-mem:' + k, v); } catch (e) { }
+      }
+
+      function currentFont() {
+        var v = parseInt(getComputedStyle(root).getPropertyValue('--am-font-size'), 10);
+        return isNaN(v) ? FONT_DEFAULT : v;
+      }
+
+      var btnTheme = document.getElementById('am-theme');
+      var btnDec = document.getElementById('am-font-dec');
+      var btnInc = document.getElementById('am-font-inc');
+      var label = document.getElementById('am-font-val');
+
+      function syncTheme() {
+        var dark = root.getAttribute('data-theme') === 'dark';
+        // 显示的是「点下去会切到哪个模式」
+        btnTheme.textContent = dark ? '☀️' : '🌙';
+        btnTheme.setAttribute('aria-pressed', String(dark));
+        btnTheme.title = dark ? '切到白天模式（快捷键 T）' : '切到夜间模式（快捷键 T）';
+      }
+
+      function setTheme(dark) {
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        store('theme', dark ? 'dark' : 'light');
+        syncTheme();
+        window.__amRenderMermaid && window.__amRenderMermaid(true);
+      }
+
+      function setFont(px) {
+        px = Math.min(FONT_MAX, Math.max(FONT_MIN, px));
+        root.style.setProperty('--am-font-size', px + 'px');
+        store('fontsize', px);
+        label.textContent = px;
+        btnDec.disabled = px <= FONT_MIN;
+        btnInc.disabled = px >= FONT_MAX;
+      }
+
+      btnTheme.addEventListener('click', function () {
+        setTheme(root.getAttribute('data-theme') !== 'dark');
+      });
+      btnDec.addEventListener('click', function () { setFont(currentFont() - FONT_STEP); });
+      btnInc.addEventListener('click', function () { setFont(currentFont() + FONT_STEP); });
+
+      // 用户没手动选过主题时，跟随系统切换
+      try {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          if (!localStorage.getItem('agent-mem:theme')) {
+            root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            syncTheme();
+            window.__amRenderMermaid && window.__amRenderMermaid(true);
+          }
+        });
+      } catch (e) { }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+        if (e.key === 't' || e.key === 'T') {
+          setTheme(root.getAttribute('data-theme') !== 'dark');
+        } else if (e.key === '+' || e.key === '=') {
+          setFont(currentFont() + FONT_STEP);
+        } else if (e.key === '-' || e.key === '_') {
+          setFont(currentFont() - FONT_STEP);
+        }
+      });
+
+      syncTheme();
+      setFont(currentFont());
+    })();
+  </script>
+
   <script>
     window.$docsify = {
       name: 'agent-mem',
@@ -53,10 +462,16 @@
       homepage: 'README.md',
       coverpage: '_coverpage.md',
       loadSidebar: '_sidebar.md',
+      // 子目录（chapterN/、附录/）下没有各自的 _sidebar.md，
+      // 统一别名到根部那一份，否则每进一章都会多打一次 404。
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md'
+      },
+      // 注意：不要开 relativePath。_sidebar.md 里写的是根相对路径，
+      // 一旦开启，进入 /chapter1/ 后链接会被拼成 /chapter1/chapter2/...，全线 404。
       subMaxLevel: 2,
       maxLevel: 3,
       auto2top: true,
-      relativePath: true,
       notFoundPage: true,
       themeColor: '#3f7ef0',
       search: {
@@ -81,21 +496,146 @@
         buttonText: '复制',
         errorText: '复制失败',
         successText: '已复制'
-      }
-    }
+      },
+      plugins: [
+        function (hook) {
+          // 每次页面渲染完成后跑一遍公式与图表。
+          // 不走 markdown.renderer 改写，是为了不和 marked 的版本变化耦合。
+          hook.doneEach(function () {
+            window.__amRenderMath && window.__amRenderMath();
+            window.__amRenderMermaid && window.__amRenderMermaid(false);
+          });
+        }
+      ]
+    };
   </script>
 
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-count/dist/countable.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2.10.1/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-count@1.0.1/dist/countable.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2.1.1"></script>
+
+  <!-- 语法高亮 -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+
+  <!-- 公式：KaTeX 官方 auto-render。
+       不用 docsify-katex —— 它的 @latest 已变成 959 字节的壳，
+       不再自带 katex 核心，会静默地什么都不渲染。 -->
+  <script defer src="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- 图表 -->
+  <script src="//cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+
+  <script>
+    // ==========================================================
+    // 公式渲染
+    // auto-render 默认忽略 pre / code / script 等标签，
+    // 所以 bash 里的 $VAR、代码块里的 $ 不会被误当成公式。
+    // ==========================================================
+    window.__amRenderMath = function () {
+      if (typeof renderMathInElement !== 'function') return;
+      var el = document.querySelector('.markdown-section');
+      if (!el) return;
+      try {
+        renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
+          ],
+          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'],
+          ignoredClasses: ['mermaid'],
+          throwOnError: false
+        });
+      } catch (e) {
+        console.warn('[agent-mem] 公式渲染失败：', e);
+      }
+    };
+
+    // ==========================================================
+    // Mermaid 渲染
+    // docsify 会把 ```mermaid 渲染成 <pre data-lang="mermaid">，
+    // 这里在 DOM 层面换成 <div class="mermaid">，不改 markdown renderer。
+    // ==========================================================
+    (function () {
+      var seq = 0;
+
+      function initMermaid() {
+        if (typeof mermaid === 'undefined') return false;
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: dark ? 'dark' : 'default',
+          securityLevel: 'strict',
+          fontFamily: 'inherit',
+          flowchart: { htmlLabels: true, curve: 'basis' }
+        });
+        return true;
+      }
+
+      window.__amRenderMermaid = function (themeChanged) {
+        if (!initMermaid()) return;
+        var section = document.querySelector('.markdown-section');
+        if (!section) return;
+
+        // 1) 把还没转换过的 <pre data-lang="mermaid"> 换成 <div class="mermaid">
+        section.querySelectorAll('pre[data-lang="mermaid"]').forEach(function (pre) {
+          // 只取 <code> 的内容。docsify-copy-code 会往 <pre> 里插一个按钮，
+          // 直接读 pre.textContent 会把「复制/复制失败/已复制」拼进图表源码，
+          // 于是图上会凭空多出一个节点。
+          var codeEl = pre.querySelector('code');
+          var src = ((codeEl || pre).textContent || '').trim();
+          var div = document.createElement('div');
+          div.className = 'mermaid';
+          div.setAttribute('data-src', src);   // 留底，切主题时要重画
+          div.textContent = src;
+          pre.parentNode.replaceChild(div, pre);
+        });
+
+        // 2) 切主题时，把已画好的图还原成源码再重画一遍
+        var nodes = [];
+        section.querySelectorAll('div.mermaid').forEach(function (div) {
+          if (themeChanged) {
+            var src = div.getAttribute('data-src');
+            if (src) {
+              div.removeAttribute('data-processed');
+              div.textContent = src;
+            }
+          }
+          if (!div.getAttribute('data-processed')) {
+            if (!div.id) div.id = 'am-mermaid-' + (++seq);
+            nodes.push(div);
+          }
+        });
+
+        if (!nodes.length) return;
+
+        try {
+          // mermaid 10/11 用 run()，9 及更早用 init()
+          if (typeof mermaid.run === 'function') {
+            mermaid.run({ nodes: nodes, suppressErrors: true });
+          } else {
+            mermaid.init(undefined, nodes);
+          }
+        } catch (e) {
+          console.warn('[agent-mem] 图表渲染失败：', e);
+          nodes.forEach(function (n) {
+            if (!n.querySelector('svg')) {
+              n.innerHTML = '<div class="mermaid-error">图表渲染失败：' +
+                String(e.message || e).replace(/[<>&]/g, '') + '</div>';
+            }
+          });
+        }
+      };
+    })();
+  </script>
 </body>
 
 </html>
