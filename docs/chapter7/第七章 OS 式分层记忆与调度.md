@@ -174,6 +174,9 @@ python docs/chapter7/code/02_summary_decay.py
     「我在星辰银行工作；我对花生过敏；我负责的项目代号是 XR-2」
 ```
 
+<img class="fig-light" src="images/fig-7-2-summary-decay-light.svg" alt="摘要退化曲线：五轮摘要后关键点覆盖率从 100% 降到 25%">
+<img class="fig-dark" src="images/fig-7-2-summary-decay-dark.svg" alt="摘要退化曲线：五轮摘要后关键点覆盖率从 100% 降到 25%">
+
 ### 7.4.1 三个观察
 
 **第一，第一次摘要就丢掉了「行动指引」。** 「一定要提前确认配料」这类约束在摘要里最先消失，因为它们不是「属性 = 值」的形式——第 2 章已经预告过这一点。

@@ -116,6 +116,11 @@ $$
 
 **轮数翻倍，账单翻四倍**。500 轮时，全历史方案的累计输入 token 是检索方案的约 120 倍。
 
+<img class="fig-light" src="images/fig-1-4-token-growth-light.svg" alt="四种策略的累计输入 token 增长曲线，纵轴为对数轴">
+<img class="fig-dark" src="images/fig-1-4-token-growth-dark.svg" alt="四种策略的累计输入 token 增长曲线，纵轴为对数轴">
+
+注意纵轴是对数轴——在对数轴上，「全历史」那条线依然明显比其他三条陡，这就是二次增长与线性增长的区别。
+
 这个数字有几个必须说明的前提：它只算了输入侧；它假设每轮长度相同；它没有考虑 prompt 缓存（主流 API 大多对重复前缀有折扣，实际账单会低于这个估算，但增长的**阶**不变）。所以请把它当作量级参考，不是账单。
 
 ### 第二笔：上下文窗口有硬上限
@@ -131,6 +136,12 @@ $$
 即使窗口塞得下，模型也未必用得好。
 
 > 📄 Liu et al. 的 *Lost in the Middle*（arXiv:2307.03172，TACL 2024）系统地测量了这一现象：当关键信息位于长输入的**中部**时，模型的检索准确率明显低于它位于开头或结尾时，形成一条 U 形曲线。这个结论在多个模型上成立。
+
+<img class="fig-light" src="images/fig-1-5-lost-in-the-middle-light.svg" alt="Lost in the Middle 的 U 形曲线示意：关键信息位于输入中部时准确率最低">
+<img class="fig-dark" src="images/fig-1-5-lost-in-the-middle-dark.svg" alt="Lost in the Middle 的 U 形曲线示意：关键信息位于输入中部时准确率最低">
+
+> **这张图纵轴没有刻度，是故意的。** 本书没有复现该论文的实验，因此只画趋势、不标数值——
+> 按本书的规矩（见 README「关于本教程引用的数字」），未经复现的第三方数字不以精确形式呈现。
 
 后续的长上下文基准（RULER、HELMET、∞Bench、LongBench 系列，见第 10 章）也反复表明：**「窗口长度」和「有效使用长度」是两回事**，前者是规格，后者要测。
 
@@ -231,16 +242,35 @@ $$
 
 ### 本书采用的三轴
 
-```
-表征（记忆存在哪里）              操作（对记忆做什么）           载体（用什么存）
-├─ 参数化 parametric             ├─ 编码 Encoding              ├─ 内存 / 文件
-│    权重里，第 9 章               ├─ 巩固 Consolidation         ├─ 向量库
-├─ 上下文-非结构化                 ├─ 索引 Indexing              ├─ 图库
-│    原文 / 摘要，第 2、3 章        ├─ 检索 Retrieval             ├─ 关系库
-└─ 上下文-结构化                   ├─ 更新 Updating              └─ 模型权重
-     图 / 表 / 技能，第 4~8 章      ├─ 遗忘 Forgetting
-                                 ├─ 压缩 Compression
-                                 └─ 反思 Reflection
+```mermaid
+%% 三根轴是正交维度，彼此没有先后关系，所以图里没有任何箭头。
+%% 注意：子图之间一旦有连接（哪怕是不可见的 ~~~），子图内的 direction 就会失效，
+%% 三栏会被压成一行。这里靠 flowchart TB 让每栏纵向排列、三栏横向并排。
+%% 子图按「逆声明顺序」从左往右摆，所以这里倒着写：
+%% 载体 → 操作 → 表征，渲染出来才是 表征 | 操作 | 载体。
+flowchart TB
+    subgraph S["载体 · 用什么存"]
+        S1["内存 / 文件"]
+        S2["向量库"]
+        S3["图库"]
+        S4["关系库"]
+        S5["模型权重"]
+    end
+    subgraph O["操作 · 对记忆做什么"]
+        O1["编码 Encoding"]
+        O2["巩固 Consolidation"]
+        O3["索引 Indexing"]
+        O4["检索 Retrieval"]
+        O5["更新 Updating"]
+        O6["遗忘 Forgetting"]
+        O7["压缩 Compression"]
+        O8["反思 Reflection"]
+    end
+    subgraph R["表征 · 记忆存在哪里"]
+        R1["参数化 parametric<br/>权重里 · 第 9 章"]
+        R2["上下文-非结构化<br/>原文 / 摘要 · 第 2、3 章"]
+        R3["上下文-结构化<br/>图 / 表 / 技能 · 第 4~8 章"]
+    end
 ```
 
 它比四分法好用在三点：
@@ -281,6 +311,22 @@ Du 等人定义了六种原子操作，本书在此基础上补充「编码」�
 > **不能被比较的方案，等于没有结论。**
 
 如果第 3 章的向量记忆和第 7 章的分层记忆各有各的 API，那到第 10 章就没法把它们放进同一个评测里，全书就退化成八篇互不相干的介绍文。
+
+```mermaid
+flowchart TB
+    MS["MemoryStore（抽象接口）<br/>add · search · update · delete · all<br/>每个方法都带 user_id"]
+    MS --> B["BufferMemory<br/>第 1 章"]
+    MS --> W["WindowMemory<br/>第 2 章"]
+    MS --> V["VectorMemory<br/>第 3 章"]
+    MS --> G["GraphMemory<br/>第 4 章"]
+    MS --> T["TemporalGraphMemory<br/>第 5 章"]
+    MS --> A["AgenticMemory<br/>第 6 章"]
+    MS --> L["LayeredMemory<br/>第 7 章"]
+    MS --> S["SkillMemory<br/>第 8 章"]
+    B & W & V & G & T & A & L & S --> H["EvalHarness（第 10 章）<br/>同一套数据、同一张对比表"]
+```
+
+八种实现、一个接口、一张对比表——这是全书能给出结论的前提。
 
 接口本身很小：
 
@@ -463,10 +509,11 @@ python docs/chapter1/code/03_buffer_walls.py
 
 ### 三堵墙与三根轴
 
-```
-    语义鸿沟   → 表征问题：怎么把「意思」变成可计算的东西    → 第 3、4 章
-    规模天花板  → 索引与调度问题：怎么不扫全表              → 第 3、7 章
-    知识演化   → 操作问题：怎么更新、失效、遗忘             → 第 5、6 章
+```mermaid
+flowchart LR
+    W1["墙一<br/>语义鸿沟"] --> A1["表征问题<br/>怎么把「意思」变成可计算的东西"] --> C1["第 3、4 章"]
+    W2["墙二<br/>规模天花板"] --> A2["索引与调度问题<br/>怎么不扫全表"] --> C2["第 3、7 章"]
+    W3["墙三<br/>知识演化"] --> A3["操作问题<br/>怎么更新、失效、遗忘"] --> C3["第 5、6 章"]
 ```
 
 这三个方向恰好落在「表征 × 操作 × 载体」三根轴上。这不是巧合，而是这套分类法值得用的原因：**它能把你实际遇到的问题，直接映射到该读哪一章**。
