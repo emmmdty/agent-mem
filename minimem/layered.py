@@ -80,10 +80,18 @@ class _Entry:
 
         两个因子缺一不可：只看次数，老热点永远占着 core；
         只看新近度，就退化成第 2 章的滑动窗口了。
+
+        Args:
+            now: 参考时刻。**必须传「这批记忆里最新的那个时刻」而不是当前挂钟时间**，
+                否则一批都很老的记忆会全部下溢到 0，排序退化成不确定——
+                半衰期一周时，一年前的记忆衰减到 2e-16，两年前到 4e-32。
+                见 ``LayeredMemory._reference_time``。
         """
         last = self.last_access or self.item.created_at
         age = max((now - last).total_seconds(), 0.0)
-        decay = 0.5 ** (age / _DECAY_HALF_LIFE_S)
+        # 指数还要再兜一层底：即便参考时刻取对了，跨度极大的记忆库仍可能下溢。
+        # 下溢的后果不是「热度很低」，而是**所有条目并列为 0、换页变成随机**。
+        decay = max(0.5 ** (age / _DECAY_HALF_LIFE_S), 1e-12)
         return (1.0 + self.hits) * decay
 
 
@@ -141,6 +149,25 @@ class LayeredMemory(MemoryStore):
     def _now() -> datetime:
         return datetime.now(timezone.utc)
 
+    def _reference_time(self, user_id: str) -> datetime:
+        """算热度时的参考时刻：**这批记忆里最新的那个时刻**。
+
+        为什么不用挂钟时间：热度是个**相对**概念，衡量的是「这条记忆相对于
+        最近一次活动有多旧」。如果整批记忆都是一年前的（导入历史数据，
+        或者用带固定时间戳的数据集），按挂钟算年龄会让它们的衰减因子
+        **一起下溢**——那时换页不是「按热度」，是随机。
+
+        中间试过 ``max(now, newest)``，测试立刻发现它不够：
+        挂钟远晚于全部记忆时，它又退回成了挂钟时间。**参考点必须锚在数据上。**
+
+        新写入或被 promote 的记忆会把 last_access 设成当下，
+        自然成为新的参考点，所以「最近活动」这个语义是自洽的。
+        """
+        entries = self._entries.get(user_id, {})
+        if not entries:
+            return self._now()
+        return max((e.last_access or e.item.created_at) for e in entries.values())
+
     # ------------------------------------------------------------------
     # 分层与换页
     # ------------------------------------------------------------------
@@ -160,7 +187,7 @@ class LayeredMemory(MemoryStore):
         顺序很重要：先处理 core→recall，再处理 recall→archival。
         反过来的话，刚从 core 换出的记忆可能立刻被推进 archival。
         """
-        now = self._now()
+        now = self._reference_time(user_id)
         entries = self._entries.get(user_id, {})
 
         core = [e for e in entries.values() if e.layer == "core"]
@@ -256,7 +283,7 @@ class LayeredMemory(MemoryStore):
         scored = [(pool[i], float(sims[i]) * boost[pool[i].layer]) for i in range(len(pool))]
         scored.sort(key=lambda kv: kv[1], reverse=True)
 
-        now = self._now()
+        now = self._reference_time(user_id)
         results = []
         for entry, score in scored[:k]:
             entry.hits += 1

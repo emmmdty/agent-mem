@@ -92,6 +92,10 @@ class Progress:
     streak_days: int = 0
     last_active: str = ""
 
+    def __post_init__(self) -> None:
+        # 实例属性而非 dataclass 字段：asdict() 不会把它写进 JSON
+        self._base: Path | None = None
+
     # ------------------------------------------------------------------
 
     @classmethod
@@ -100,15 +104,26 @@ class Progress:
 
     @classmethod
     def load(cls, base: Path | None = None) -> Progress:
+        """从 ``base`` 目录加载进度，并**记住这个目录**。
+
+        记住它是为了让后续无参数的 ``save()`` 写回同一个地方。
+        早期版本不记，于是测试里 ``Progress.load(tmp_path)`` 之后
+        runner 内部的 ``progress.save()`` 会写到仓库根的 ``.learn/``——
+        测试污染了工作区，而且因为 ``.learn/`` 在 .gitignore 里，
+        这个副作用一直没被发现。
+        """
         p = cls.path(base)
         if not p.exists():
-            return cls(started=date.today().isoformat())
-        raw = json.loads(p.read_text(encoding="utf-8"))
-        cards = {k: CardState(**v) for k, v in raw.pop("cards", {}).items()}
-        return cls(**raw, cards=cards)
+            obj = cls(started=date.today().isoformat())
+        else:
+            raw = json.loads(p.read_text(encoding="utf-8"))
+            cards = {k: CardState(**v) for k, v in raw.pop("cards", {}).items()}
+            obj = cls(**raw, cards=cards)
+        obj._base = base
+        return obj
 
     def save(self, base: Path | None = None) -> None:
-        p = self.path(base)
+        p = self.path(base if base is not None else self._base)
         p.parent.mkdir(parents=True, exist_ok=True)
         data = asdict(self)
         data["cards"] = {k: asdict(v) for k, v in self.cards.items()}

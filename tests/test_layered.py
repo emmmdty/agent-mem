@@ -166,3 +166,47 @@ class TestMutation:
         store.add(MemoryItem("我对花生过敏", metadata={"layer": "core"}), user_id=USER)
         assert store.recall_rate(["花生"], user_id=USER) == 1.0
         assert store.recall_rate(["海鲜"], user_id=USER) == 0.0
+
+
+class TestHeatNumerics:
+    """热度衰减的数值稳定性。
+
+    半衰期是一周，而 0.5**(age/half_life) 在 age 上到一年时就衰减到 2e-16，
+    两年到 4e-32。如果一整批记忆都很老（导入历史数据、或用带固定时间戳的
+    数据集），它们会**一起下溢到 0**——那时换页不是「按热度」，是随机。
+    """
+
+    def test_参考时刻取最新记忆而非挂钟时间(self):
+        from datetime import datetime, timedelta, timezone
+
+        old = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        s = LayeredMemory(core_budget=100_000, embedder=FakeEmbedder(), meter=Meter())
+        for i in range(3):
+            s.add(MemoryItem(f"很旧的记忆 {i}", created_at=old + timedelta(days=i)), user_id=USER)
+
+        ref = s._reference_time(USER)
+        assert ref == old + timedelta(days=2), "参考时刻应锚在最新记忆上，而不是挂钟时间"
+
+    def test_一批旧记忆的热度不会全部下溢(self):
+        """全部为 0 时排序退化——这正是要避免的。"""
+        from datetime import datetime, timedelta, timezone
+
+        old = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        s = LayeredMemory(core_budget=100_000, embedder=FakeEmbedder(), meter=Meter())
+        ids = [
+            s.add(MemoryItem(f"旧记忆 {i}", created_at=old + timedelta(days=i * 30)), user_id=USER)
+            for i in range(4)
+        ]
+
+        ref = s._reference_time(USER)
+        heats = [s._locate(i, USER).heat(ref) for i in ids]
+        assert all(h > 0 for h in heats), "热度不应下溢到 0"
+        assert len(set(heats)) > 1, "热度必须还能区分先后，否则换页变成随机"
+
+    def test_热度有下限兜底(self):
+        from datetime import datetime, timezone
+
+        entry_old = MemoryItem("远古记忆", created_at=datetime(1990, 1, 1, tzinfo=timezone.utc))
+        s = LayeredMemory(core_budget=100_000, embedder=FakeEmbedder(), meter=Meter())
+        mid = s.add(entry_old, user_id=USER)
+        assert s._locate(mid, USER).heat(datetime.now(timezone.utc)) > 0

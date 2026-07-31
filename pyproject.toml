@@ -63,7 +63,10 @@ eval = [
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
-    "ruff>=0.6",
+    # **lint 工具的版本必须收窄**。ruff 每个小版本都可能引入新规则，
+    # 而 CI 每次都装最新版——那意味着「一行代码没改，CI 却突然变红」。
+    # 升级 ruff 应该是一次显式的、单独的 PR，不该由 CI 随机触发。
+    "ruff>=0.16,<0.17",
 ]
 # 一次装齐（不含第 9 章的 GPU 相关依赖，见 docs/chapter9/code/requirements.txt）
 all = ["minimem[vector,graph,llm,eval,dev]"]

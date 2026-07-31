@@ -232,6 +232,25 @@ class TestRunnerSmoke:
         assert "第 1 章" in out
         assert progress.is_done("ch01")
 
+    def test_不污染工作区(self, monkeypatch, tmp_path):
+        """runner 内部的 save() 必须写回 load() 时的目录，而不是仓库根。
+
+        这个副作用曾经存在很久没被发现——因为 .learn/ 在 .gitignore 里。
+        """
+        from minimem.learn import runner
+
+        monkeypatch.setattr(runner, "_interactive", lambda: False)
+        monkeypatch.chdir(tmp_path)  # 换个 CWD，默认路径会落在这里
+        store_dir = tmp_path / "elsewhere"
+
+        progress = Progress.load(store_dir)
+        lesson = get_lesson(1)
+        assert lesson is not None
+        runner.run_lesson(lesson, progress, REPO_ROOT)
+
+        assert (store_dir / "progress.json").exists(), "应写回 load 时指定的目录"
+        assert not (tmp_path / ".learn").exists(), "不得写到默认目录"
+
     def test_总览能渲染(self, tmp_path, capsys):
         from minimem.learn import runner
 
